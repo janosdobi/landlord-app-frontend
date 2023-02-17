@@ -5,5 +5,5 @@
 </script>
 
 <Modal title="An error occurred!" on:cancel>
-    <p>{message}</p>
+    <p>{(message.length == 0) ? "We do not know any details, sorry" : message}</p>
 </Modal>

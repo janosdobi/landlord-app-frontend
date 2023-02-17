@@ -18,11 +18,11 @@
     position: absolute;
     width: 51px;
     height: 51px;
-    margin: 6px;
-    border: 6px solid #cf0056;
+    margin-top: 10rem;
+    border: 6px solid #0098cf;
     border-radius: 50%;
     animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: #cf0056 transparent transparent transparent;
+    border-color: #0098cf transparent transparent transparent;
   }
   .lds-ring div:nth-child(1) {
     animation-delay: -0.45s;
