@@ -15,50 +15,34 @@
 	$: formIsValid = nameValid && pwdValid;
 
 	function submitForm() {
+    dispatch("loginStarted")
 		const loginRequestBody = {
 			username: name,
 			password: password
 		};
 
-		// if (id) {
-		//   fetch(`https://svelte-course.firebaseio.com/meetups/${id}.json`, {
-		//     method: "PATCH",
-		//     body: JSON.stringify(meetupData),
-		//     headers: { "Content-Type": "application/json" }
-		//   })
-		//     .then(res => {
-		//       if (!res.ok) {
-		//         throw new Error("An error occurred, please try again!");
-		//       }
-		//       meetups.updateMeetup(id, meetupData);
-		//     })
-		//     .catch(err => {
-		//       console.log(err);
-		//     });
-		// } else {
-		//   fetch("https://svelte-course.firebaseio.com/meetups.json", {
-		//     method: "POST",
-		//     body: JSON.stringify({ ...meetupData, isFavorite: false }),
-		//     headers: { "Content-Type": "application/json" }
-		//   })
-		//     .then(res => {
-		//       if (!res.ok) {
-		//         throw new Error("An error occurred, please try again!");
-		//       }
-		//       return res.json();
-		//     })
-		//     .then(data => {
-		//       meetups.addMeetup({
-		//         ...meetupData,
-		//         isFavorite: false,
-		//         id: data.name
-		//       });
-		//     })
-		//     .catch(err => {
-		//       console.log(err);
-		//     });
-		// }
-		dispatch('login');
+		fetch(`http://localhost:8091/api/login`, {
+			method: 'POST',
+			body: JSON.stringify(loginRequestBody),
+			headers: { 'Content-Type': 'application/json' }
+		})
+			.then((res) => {
+				if (!res.ok) {
+					throw new Error('An error occurred, please try again!');
+				} else {
+					return res.text();
+				}
+			})
+			.then((responseBody) => {
+        const responseJSON = JSON.parse(responseBody)
+				localStorage.setItem('jwt', responseJSON.access_token);
+				localStorage.setItem('userName', responseJSON.username);
+				localStorage.setItem('userRoles', responseJSON.roles);
+        dispatch('loginFinished');
+			})
+			.catch((err) => {
+				console.log(err);
+			});
 	}
 </script>
 
@@ -72,10 +56,10 @@
 			value={name}
 			on:input={(event) => (name = event.target.value)}
 		/>
-    <TextInput
+		<TextInput
 			id="password"
 			label="Password"
-      type="password"
+			type="password"
 			valid={pwdValid}
 			validityMessage="Please enter a valid password."
 			value={password}
