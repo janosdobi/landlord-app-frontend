@@ -1,5 +1,5 @@
 <script>
-	import { onMount, beforeUpdate } from 'svelte';
+	import { onMount } from 'svelte';
 	import LoadingSpinner from '../components/UI/LoadingSpinner.svelte';
 	import Login from '../components/Login.svelte';
 	import Header from '../components/UI/Header.svelte';
@@ -16,7 +16,7 @@
     function validateLocalToken() {
         let token = localStorage.getItem('jwt');
 		if (token != null) {
-			fetch('http://localhost:8091/api/auth/valid', {
+			fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/valid`, {
 				headers: {
 					'Content-Type': 'application/json',
 					Authorization: 'Bearer ' + token
@@ -28,6 +28,15 @@
 						userLoggedIn = true;
                         userName = localStorage.getItem("userName")
                         userRoles = localStorage.getItem("userRoles")
+					} else if (res.status == 401) {
+						localStorage.removeItem('jwt');
+						localStorage.removeItem('userName');
+						localStorage.removeItem('userRoles');
+						isLoading = false;
+						userLoggedIn = false;
+					} else {
+						isLoading = false;
+						isError = true;
 					}
 				})
 				.catch((err) => {
@@ -40,12 +49,7 @@
         }
     }
 
-    function handleLoginStarted() {
-        isLoading = true;
-    }
-
 	onMount(validateLocalToken);
-    beforeUpdate(() => {console.log("Before update")});
 </script>
 
 <main>
@@ -56,7 +60,7 @@
 	{:else if userLoggedIn && !isError}
 		<ApartmentDetails user={userName} roles={userRoles}/>
 	{:else if !userLoggedIn && !isError}
-		<Login on:loginFinished = {validateLocalToken} on:loginStarted = {handleLoginStarted}/>
+		<Login on:loginSuccess = {validateLocalToken}/>
     {:else if isError}
         <Error message={errorMessage} />
 	{/if}
